@@ -22,6 +22,9 @@ class DataStream(ABC):
      
 
 class SensorStream(DataStream):
+    def __init__(self, stream_id, stream_type):
+        super().__init__(stream_id, stream_type)
+
     def process_batch(self, data_batch: List[Any]) -> str:
         pass
 
@@ -34,6 +37,9 @@ class SensorStream(DataStream):
 
 
 class TransactionStream(DataStream):
+    def __init__(self, stream_id, stream_type):
+        super().__init__(stream_id, stream_type)
+
     def process_batch(self, data_batch: List[Any]) -> str:
         pass
 
@@ -46,6 +52,9 @@ class TransactionStream(DataStream):
 
 
 class EventStream(DataStream):
+    def __init__(self, stream_id, stream_type):
+        super().__init__(stream_id, stream_type)
+
     def process_batch(self, data_batch: List[Any]) -> str:
         pass
 
@@ -55,4 +64,3 @@ class EventStream(DataStream):
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         pass
-
