@@ -12,7 +12,6 @@ class DataStream(ABC):
     def process_batch(self, data_batch: List[Any]) -> str:
         pass
 
-    @abstractmethod
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         if criteria:
@@ -21,7 +20,6 @@ class DataStream(ABC):
         else:
             return data_batch
 
-    @abstractmethod
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         stats = dict()
         stats["stream_id"] = self.stream_id
@@ -44,10 +42,13 @@ class SensorStream(DataStream):
                     raise TypeError("Invalid item type")
                 else:
                     parts = item.split(":")
-                    data[parts[0]] += round(float(parts[1]), 1)
+                    if parts[0] in data.keys():
+                        data[parts[0]] += round(float(parts[1]), 1)
+                    else:
+                        data[parts[0]] = round(float(parts[1]), 1)
 
-        except (TypeError, ValueError) as e:
-            return f"Error processing Sensor data: {e}"
+        except TypeError as e:
+            return str(e)
         read = len(data.keys())
         avg = data["temp"]
         self.process_count += len(data_batch)
@@ -89,7 +90,6 @@ class TransactionStream(DataStream):
         return f"Transaction analysis: {len(data_batch)} operations,\
 net flow: {net} units"
 
-
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
         pass
@@ -115,7 +115,6 @@ class EventStream(DataStream):
         err_count = sum(1 for item in data_batch if item == "error")
         self.process_count += len(data_batch)
         return f"{total} events, {err_count} error detected"
-            
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
@@ -123,3 +122,27 @@ class EventStream(DataStream):
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
         pass
+
+
+class StreamProcessor(DataStream):
+    def __init__(self, streams: List[DataStream]):
+        self.streams = streams
+
+    def add_stream(self, stream: DataStream):
+        self.streams.append(stream)
+
+    def process_all(stream_data: Dict):
+        for stream, data in stream_data.items():
+            try:
+                result = stream.process_batch(data)
+                print(result)
+            except Exception as e:
+                print(f"Error processing {stream.stream_id}: {e}")
+
+    def filter_stream(stream: DataStream, batch: List[Any],
+                      criteria: Optional[str]):
+        stream.filter_data(batch, criteria)
+
+    def get_all_stats(self):
+        for stream in self.streams:
+            print(stream.get_stats())
