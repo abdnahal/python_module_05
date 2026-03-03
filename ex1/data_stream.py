@@ -76,14 +76,13 @@ class TransactionStream(DataStream):
                     raise TypeError("Invalid item type")
                 else:
                     parts = item.split(":")
-                    if "buy" != parts[0]:
-                        if "sell" != parts[0]:
-                            e = "Invalid item, expected buy or sell"
-                            raise ValueError(e)
-                        else:
-                            net -= int(parts[1])
-                    else:
+                    if parts[0] == "buy":
                         net += int(parts[1])
+                    elif parts[0] == "sell":
+                        net -= int(parts[1])
+                    else:
+                        raise ValueError("Invalid operation")
+
         except (TypeError, ValueError) as e:
             return f"Error processing Transaction data: {e}"
         self.process_count += len(data_batch)
@@ -114,7 +113,7 @@ class EventStream(DataStream):
         total = len(data_batch)
         err_count = sum(1 for item in data_batch if item == "error")
         self.process_count += len(data_batch)
-        return f"{total} events, {err_count} error detected"
+        return f"Event analysis: {total} events, {err_count} errors detected"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
@@ -124,14 +123,16 @@ class EventStream(DataStream):
         pass
 
 
-class StreamProcessor(DataStream):
+class StreamProcessor:
     def __init__(self, streams: List[DataStream]):
         self.streams = streams
 
     def add_stream(self, stream: DataStream):
+        if not isinstance(stream, DataStream):
+            raise TypeError("Invalid stream type")
         self.streams.append(stream)
 
-    def process_all(stream_data: Dict):
+    def process_all(self, stream_data: Dict):
         for stream, data in stream_data.items():
             try:
                 result = stream.process_batch(data)
@@ -139,9 +140,9 @@ class StreamProcessor(DataStream):
             except Exception as e:
                 print(f"Error processing {stream.stream_id}: {e}")
 
-    def filter_stream(stream: DataStream, batch: List[Any],
+    def filter_stream(self, stream: DataStream, batch: List[Any],
                       criteria: Optional[str]):
-        stream.filter_data(batch, criteria)
+        return stream.filter_data(batch, criteria)
 
     def get_all_stats(self):
         for stream in self.streams:
