@@ -34,6 +34,7 @@ class SensorStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         data = dict()
+        temps = []
         try:
             if not isinstance(data_batch, list):
                 raise TypeError("Invalid data_batch type")
@@ -42,6 +43,8 @@ class SensorStream(DataStream):
                     raise TypeError("Invalid item type")
                 else:
                     parts = item.split(":")
+                    if parts[0] == "temp":
+                        temps.append(float(parts[1]))
                     if parts[0] in data.keys():
                         data[parts[0]] += round(float(parts[1]), 1)
                     else:
@@ -49,17 +52,17 @@ class SensorStream(DataStream):
 
         except TypeError as e:
             return str(e)
-        read = len(data.keys())
-        avg = data["temp"]
+        read = len(data_batch)
+        avg = sum(temps) / len(temps)
         self.process_count += len(data_batch)
         return f"Sensor analysis: {read} readings processed, avg temp: {avg}°C"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
-        pass
+        super().filter_data()
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        pass
+        super().get_stats()
 
 
 class TransactionStream(DataStream):
@@ -86,15 +89,15 @@ class TransactionStream(DataStream):
         except (TypeError, ValueError) as e:
             return f"Error processing Transaction data: {e}"
         self.process_count += len(data_batch)
-        return f"Transaction analysis: {len(data_batch)} operations,\
+        return f"Transaction analysis: {len(data_batch)} operations, \
 net flow: {net} units"
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
-        pass
+        super().filter_data()
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        pass
+        super().get_stats()
 
 
 class EventStream(DataStream):
@@ -117,15 +120,15 @@ class EventStream(DataStream):
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
-        pass
+        super().filter_data()
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        pass
+        super().get_stats()
 
 
 class StreamProcessor:
     def __init__(self, streams: List[DataStream]):
-        self.streams = streams
+        self.streams = streams if streams else []
 
     def add_stream(self, stream: DataStream):
         if not isinstance(stream, DataStream):
@@ -147,3 +150,36 @@ class StreamProcessor:
     def get_all_stats(self):
         for stream in self.streams:
             print(stream.get_stats())
+
+
+def main():
+    # Create stream instances
+    sensor = SensorStream("S1", "sensor")
+    transaction = TransactionStream("T1", "finance")
+    event = EventStream("E1", "system")
+
+    # Create processor and register streams
+    processor = StreamProcessor([sensor, transaction, event])
+
+    # Prepare test data
+    stream_data = {
+        sensor: ["temp:20", "temp:30", "humidity:50"],
+        transaction: ["buy:10", "sell:5"],
+        event: ["login", "error", "logout"]
+    }
+
+    print("=== PROCESSING ALL STREAMS ===")
+    processor.process_all(stream_data)
+
+    print("\n=== FILTER EXAMPLE (Sensor: only 'temp') ===")
+    filtered = processor.filter_stream(sensor,
+                                       ["temp:20", "humidity:40", "temp:30"],
+                                       "temp")
+    print(filtered)
+
+    print("\n=== STREAM STATS ===")
+    processor.get_all_stats()
+
+
+if __name__ == "__main__":
+    main()
