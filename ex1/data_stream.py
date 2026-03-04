@@ -52,17 +52,10 @@ class SensorStream(DataStream):
 
         except TypeError as e:
             return str(e)
-        read = len(data_batch)
+        read = len(data.keys())
         avg = sum(temps) / len(temps)
         self.process_count += len(data_batch)
         return f"Sensor analysis: {read} readings processed, avg temp: {avg}°C"
-
-    def filter_data(self, data_batch: List[Any],
-                    criteria: Optional[str] = None) -> List[Any]:
-        super().filter_data()
-
-    def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        super().get_stats()
 
 
 class TransactionStream(DataStream):
@@ -92,13 +85,6 @@ class TransactionStream(DataStream):
         return f"Transaction analysis: {len(data_batch)} operations, \
 net flow: {net} units"
 
-    def filter_data(self, data_batch: List[Any],
-                    criteria: Optional[str] = None) -> List[Any]:
-        super().filter_data()
-
-    def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        super().get_stats()
-
 
 class EventStream(DataStream):
     def __init__(self, stream_id, stream_type):
@@ -117,13 +103,6 @@ class EventStream(DataStream):
         err_count = sum(1 for item in data_batch if item == "error")
         self.process_count += len(data_batch)
         return f"Event analysis: {total} events, {err_count} errors detected"
-
-    def filter_data(self, data_batch: List[Any],
-                    criteria: Optional[str] = None) -> List[Any]:
-        super().filter_data()
-
-    def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        super().get_stats()
 
 
 class StreamProcessor:
