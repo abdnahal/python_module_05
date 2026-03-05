@@ -37,9 +37,9 @@ class NumericProcessor(DataProcessor):
         try:
             if not self.validate(data):
                 raise ValueError("Expected a non-empty list of numeric values")
-            numeric_data: List[Number] = data
-            total: Number = sum(numeric_data)
-            avg: float = total / len(numeric_data)
+            numeric_data = data
+            total = sum(numeric_data)
+            avg = total / len(numeric_data)
             result = (
                 f"Processed {len(numeric_data)} numeric values, "
                 f"sum={total}, avg={round(avg, 1)}"
@@ -47,7 +47,8 @@ class NumericProcessor(DataProcessor):
             self.last_result = result
             return result
         except (TypeError, ValueError, ZeroDivisionError):
-            error_result = "Invalid numeric data: expected a non-empty list of numbers"
+            error_result = "Invalid numeric data: expected a " \
+                            "non-empty list of numbers"
             self.last_result = error_result
             return error_result
 
@@ -63,10 +64,11 @@ class TextProcessor(DataProcessor):
         try:
             if not self.validate(data):
                 raise ValueError("Expected non-empty string text")
-            text_data: str = data
-            char_count: int = len(text_data)
-            word_count: int = len(text_data.split())
-            result = f"Processed text: {char_count} characters, {word_count} words"
+            text_data = data
+            char_count = len(text_data)
+            word_count = len(text_data.split())
+            result = f"Processed text: {char_count} characters, \
+{word_count} words"
             self.last_result = result
             return result
         except (TypeError, ValueError):
@@ -80,12 +82,12 @@ class LogProcessor(DataProcessor):
         super().__init__()
 
     def _parse_log(self, data: str) -> Optional[Dict[str, str]]:
-        levels: List[str] = ["ERROR", "WARNING", "INFO", "DEBUG"]
+        levels = ["ERROR", "WARNING", "INFO", "DEBUG"]
         if ":" not in data:
             return None
         level_part, message_part = data.split(":", 1)
-        level: str = level_part.strip().upper()
-        message: str = message_part.strip()
+        level = level_part.strip().upper()
+        message = message_part.strip()
         if level not in levels or not message:
             return None
         return {"level": level, "message": message}
@@ -93,20 +95,20 @@ class LogProcessor(DataProcessor):
     def validate(self, data: Any) -> bool:
         if not isinstance(data, str):
             return False
-        parsed: Optional[Dict[str, str]] = self._parse_log(data)
+        parsed = self._parse_log(data)
         return parsed is not None
 
     def process(self, data: Any) -> str:
         try:
             if not self.validate(data):
                 raise ValueError("Expected log format 'LEVEL: message'")
-            log_data: str = data
-            parsed: Optional[Dict[str, str]] = self._parse_log(log_data)
+            log_data = data
+            parsed = self._parse_log(log_data)
             if parsed is None:
                 raise ValueError("Invalid log content")
-            level: str = parsed["level"]
-            message: str = parsed["message"]
-            prefix: str = "[ALERT]" if level == "ERROR" else "[INFO]"
+            level = parsed["level"]
+            message = parsed["message"]
+            prefix = "[ALERT]" if level == "ERROR" else "[INFO]"
             result = f"{prefix} {level} level detected: {message}"
             self.last_result = result
             return result
@@ -133,7 +135,7 @@ if __name__ == "__main__":
     print()
     print("Initializing Text Processor...")
     text_processor = TextProcessor()
-    text_data: str = "Hello Nexus World"
+    text_data = "Hello Nexus World"
     print(f'Processing data: "{text_data}"')
     print(
         "Validation: Text data verified"
@@ -145,7 +147,7 @@ if __name__ == "__main__":
     print()
     print("Initializing Log Processor...")
     log_processor = LogProcessor()
-    log_data: str = "ERROR: Connection timeout"
+    log_data = "ERROR: Connection timeout"
     print(f'Processing data: "{log_data}"')
     print(
         "Validation: Log entry verified"
