@@ -12,8 +12,9 @@ class DataStream(ABC):
     def process_batch(self, data_batch: List[Any]) -> str:
         pass
 
-    def filter_data(self, data_batch: List[Any],
-                    criteria: Optional[str] = None) -> List[Any]:
+    def filter_data(
+        self, data_batch: List[Any], criteria: Optional[str] = None
+    ) -> List[Any]:
         if criteria:
             filtered = [item for item in data_batch if criteria in item]
             return filtered
@@ -122,8 +123,9 @@ class StreamProcessor:
             except Exception as e:
                 print(f"Error processing {stream.stream_id}: {e}")
 
-    def filter_stream(self, stream: DataStream, batch: List[Any],
-                      criteria: Optional[str]):
+    def filter_stream(
+        self, stream: DataStream, batch: List[Any], criteria: Optional[str]
+    ):
         return stream.filter_data(batch, criteria)
 
     def get_all_stats(self):
@@ -132,7 +134,6 @@ class StreamProcessor:
 
 
 def main():
-    
     sensor = SensorStream("S1", "sensor")
     transaction = TransactionStream("T1", "finance")
     event = EventStream("E1", "system")
@@ -142,16 +143,16 @@ def main():
     stream_data = {
         sensor: ["temp:20", "temp:30", "humidity:50"],
         transaction: ["buy:10", "sell:5"],
-        event: ["login", "error", "logout"]
+        event: ["login", "error", "logout"],
     }
 
     print("=== PROCESSING ALL STREAMS ===")
     processor.process_all(stream_data)
 
     print("\n=== FILTER EXAMPLE (Sensor: only 'temp') ===")
-    filtered = processor.filter_stream(sensor,
-                                       ["temp:20", "humidity:40", "temp:30"],
-                                       "temp")
+    filtered = processor.filter_stream(
+        sensor, ["temp:20", "humidity:40", "temp:30"], "temp"
+    )
     print(filtered)
 
     print("\n=== STREAM STATS ===")

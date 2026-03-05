@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import time
 
 
-class ProcessingStage(Protocol):   
+class ProcessingStage(Protocol):
     def process(self, data: Any) -> Any:
         pass
 
@@ -38,7 +38,7 @@ class ProcessingPipeline(ABC):
         return {
             "pipeline_id": self.pipeline_id,
             "processed": self.processed_count,
-            "last_runtime": self.last_runtime
+            "last_runtime": self.last_runtime,
         }
 
 
@@ -165,16 +165,17 @@ def main():
 
     print("\n=== Multi-Format Data Processing ===\n")
 
-    manager.run_all({
-        json_pipeline: '{"sensor": "temp", "value": 23.5}',
-        csv_pipeline: "user,action,timestamp",
-        stream_pipeline: "Real-time sensor stream"
-    })
+    manager.run_all(
+        {
+            json_pipeline: '{"sensor": "temp", "value": 23.5}',
+            csv_pipeline: "user,action,timestamp",
+            stream_pipeline: "Real-time sensor stream",
+        }
+    )
 
     print("\n=== Pipeline Chaining Demo ===")
-    manager.chain([json_pipeline, csv_pipeline, stream_pipeline],
-                  "Raw Data")
-    
+    manager.chain([json_pipeline, csv_pipeline, stream_pipeline], "Raw Data")
+
     print("\n=== Performance Stats ===")
     for pipeline in manager.pipelines:
         print(pipeline.get_stats())

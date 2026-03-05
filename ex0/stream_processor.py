@@ -47,9 +47,7 @@ class NumericProcessor(DataProcessor):
             self.last_result = result
             return result
         except (TypeError, ValueError, ZeroDivisionError):
-            error_result = (
-                "Invalid numeric data: expected a non-empty list of numbers"
-            )
+            error_result = "Invalid numeric data: expected a non-empty list of numbers"
             self.last_result = error_result
             return error_result
 
@@ -68,9 +66,7 @@ class TextProcessor(DataProcessor):
             text_data: str = data
             char_count: int = len(text_data)
             word_count: int = len(text_data.split())
-            result = (
-                f"Processed text: {char_count} characters, {word_count} words"
-            )
+            result = f"Processed text: {char_count} characters, {word_count} words"
             self.last_result = result
             return result
         except (TypeError, ValueError):
