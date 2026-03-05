@@ -13,6 +13,7 @@ class ProcessingPipeline(ABC):
         self.pipeline_id = pipeline_id
         self.stages: List[ProcessingStage] = []
         self.processed_count = 0
+        self.last_runtime = 0.0
 
     def add_stage(self, stage: ProcessingStage):
         self.stages.append(stage)
@@ -88,6 +89,11 @@ class InputStage:
 class TransformStage:
     def process(self, data: Any) -> Any:
         print("Transform: Enriched with metadata and validation")
+
+        if isinstance(data, dict):
+            return {k: v for k, v in data.items()}
+        if isinstance(data, list):
+            return [item.upper() for item in data]
         return data
 
 
@@ -126,7 +132,12 @@ class NexusManager:
 
 def main():
     print("=== CODE NEXUS - ENTERPRISE PIPELINE SYSTEM ===")
-    print("Initializing Nexus Manager...")
+    print("Initializing Nexus Manager...\n")
+    print("Pipeline capacity: 1000 streams/second")
+    print("Creating Data Processing Pipeline...")
+    print("Stage 1: Input validation and parsing")
+    print("Stage 2: Data transformation and enrichment")
+    print("Stage 3: Output formatting and delivery")
 
     manager = NexusManager()
 
@@ -163,6 +174,10 @@ def main():
     print("\n=== Pipeline Chaining Demo ===")
     manager.chain([json_pipeline, csv_pipeline, stream_pipeline],
                   "Raw Data")
+    
+    print("\n=== Performance Stats ===")
+    for pipeline in manager.pipelines:
+        print(pipeline.get_stats())
 
 
 if __name__ == "__main__":
