@@ -132,15 +132,13 @@ class StreamProcessor:
 
 
 def main():
-    # Create stream instances
+    
     sensor = SensorStream("S1", "sensor")
     transaction = TransactionStream("T1", "finance")
     event = EventStream("E1", "system")
 
-    # Create processor and register streams
     processor = StreamProcessor([sensor, transaction, event])
 
-    # Prepare test data
     stream_data = {
         sensor: ["temp:20", "temp:30", "humidity:50"],
         transaction: ["buy:10", "sell:5"],
